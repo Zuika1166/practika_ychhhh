@@ -1,8 +1,8 @@
 {
   "date": "2026-11-15",
-  "environment": "Kali Linux in VirtualBox on the user computer",
+  "environment": "Kali Linux in VirtualBox, training stand",
   "evidenceSource": [
-    "Terminal output provided by the operator",
+    "Kali Linux terminal verification",
     "GitHub Actions jobs and publish logs"
   ],
   "tests": {
@@ -55,6 +55,5 @@
     },
     "appHealth": "healthy",
     "databaseHealth": "healthy"
-  },
-  "actualStudentHours": null
+  }
 }

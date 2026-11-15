@@ -1,3 +1,0 @@
-NAME             IMAGE                  COMMAND                  SERVICE   CREATED         STATUS                   PORTS
-helpdesk-app-1   helpdesk:healthy       "java -XX:MaxRAMPerc…"   app       3 minutes ago   Up 2 minutes (healthy)   127.0.0.1:8080->8080/tcp
-helpdesk-db-1    postgres:17.6-alpine   "docker-entrypoint.s…"   db        5 minutes ago   Up 5 minutes (healthy)   5432/tcp

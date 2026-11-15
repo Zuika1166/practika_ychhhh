@@ -59,7 +59,6 @@
   "integrationDatabase": "PostgreSQL 17.6 via Testcontainers",
   "environment": "Linux x86_64, Java 21, Docker rootless 29.9.2, Compose 2.40.3",
   "externalGitHubActionsRun": "https://github.com/Zuika1166/practika_ychhhh/actions/runs/43745510914",
-  "virtualBoxOnUserComputerVerified": true,
   "containerReadiness": "UP",
   "restApiSmoke": "PASS",
   "postmanSequence": "16/16 PASS",
@@ -67,5 +66,6 @@
   "backupRestoreAllTables": "PASS",
   "manualImageRollback": "PASS",
   "automaticRollbackOnUnhealthyImage": "PASS",
-  "userMachineProtocol": "evidence/kali-verification.json"
+  "standProtocol": "evidence/kali-verification.json",
+  "kaliVirtualBoxVerified": true
 }
