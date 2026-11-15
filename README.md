@@ -1,21 +1,27 @@
-# Сервис обработки заявок
+# Сервис заявок
 
-REST API технической поддержки на Java и Kotlin: регистрация обращений, управление статусами и сроками, история, поиск и статистика. Пользователи: сотрудник, оператор, руководитель и администратор стенда. Один сервис Spring Boot и PostgreSQL; пользовательский интерфейс, аутентификация, уведомления и вложения в объём проекта не входят. API проверяется через Swagger UI или Postman.
+Приложение для заявок в техническую поддержку. Можно создать заявку, указать категорию, приоритет и срок, изменить статус, посмотреть историю и получить отчёт. Основная часть работает на Java, отчёт сделан на Kotlin. Данные хранятся в PostgreSQL.
 
-## 1. Технологии и запуск
+Сотрудник отправляет заявку, оператор работает с ней, руководитель смотрит отчёт. Администратор запускает приложение и делает резервные копии. Отдельного сайта с личными кабинетами нет, проверка идёт через Swagger или Postman.
 
-| Компоненты | Версии |
-| --- | --- |
-| Java / Spring Boot / Kotlin | JVM 21, Temurin 21.0.9+10 в контейнере / 3.5.7 / 2.1.21 |
-| Gradle Wrapper / PostgreSQL | 8.14.3, checksum закреплён / 17.6-alpine |
-| Testcontainers / OpenAPI / JaCoCo | 1.21.3 / springdoc 2.8.14 / 0.8.13 |
-| Форматирование | Spotless 7.0.4, google-java-format 1.24.0, ktfmt 0.54 |
-| Flyway, JDBC driver, JUnit, Mockito | Версии из BOM Spring Boot 3.5.7 |
-| Docker Compose | v2, проверено с 2.40.3; Docker Engine 25+ |
+## Что нужно для запуска
 
-Сборка использует Maven Central и Gradle Plugin Portal; динамических версий и SNAPSHOT нет. Java и Kotlin компилируются в одном Gradle-проекте для JVM 21. Для ВМ рекомендуется 4 vCPU, 6 ГБ RAM, 25 ГБ диска и доступ в интернет при первой сборке.
+Нужны Git, Docker Engine 25 или новее, Docker Compose v2 и Python 3. Для запуска тестов отдельно нужен JDK 21. На виртуальной машине использовалась Kali Linux. Рекомендуется 4 ядра, 6 ГБ памяти и 25 ГБ диска. Для первой сборки нужен интернет.
 
-Установка инструментов на Kali Linux:
+Версии в проекте:
+
+- Java 21, Spring Boot 3.5.7, Kotlin 2.1.21.
+- Gradle Wrapper 8.14.3, PostgreSQL 17.6-alpine.
+- Testcontainers 1.21.3, springdoc OpenAPI 2.8.14, JaCoCo 0.8.13.
+- Spotless 7.0.4, google-java-format 1.24.0, ktfmt 0.54.
+- Flyway, JDBC driver, JUnit и Mockito берутся из набора зависимостей Spring Boot 3.5.7.
+- В контейнере используется Temurin 21.0.9+10. Проверенная версия Compose — 2.40.3.
+
+Gradle скачивает зависимости из Maven Central и Gradle Plugin Portal. Версия Gradle и проверочная сумма закреплены в Wrapper.
+
+## Запуск на Kali Linux
+
+Установить инструменты:
 
 ```bash
 sudo apt update
@@ -24,168 +30,166 @@ sudo systemctl enable --now docker
 sudo usermod -aG docker "$USER"
 ```
 
-Повторно войти в сеанс и проверить `docker info` и `docker compose version`. Если Compose v2 установлен только как `docker-compose`, подключить его как плагин:
+После установки нужно выйти из сеанса и зайти снова чтобы появились права Docker. Проверить `docker info` и `docker compose version`.
+
+Если Compose v2 работает только командой docker-compose, подключить его как плагин:
 
 ```bash
 sudo install -d /usr/local/lib/docker/cli-plugins
 sudo ln -sf /usr/bin/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose
 ```
 
+Скачать проект и запустить:
+
 ```bash
 git clone https://github.com/Zuika1166/practika_ychhhh.git
 cd practika_ychhhh
 bash scripts/init-env.sh
 docker compose up -d --build --wait --wait-timeout 180
+docker compose ps
 curl --fail http://127.0.0.1:8080/actuator/health/readiness
 python3 scripts/smoke.py
 ```
 
-Swagger: http://127.0.0.1:8080/swagger-ui/index.html. OpenAPI: http://127.0.0.1:8080/v3/api-docs. Версия: http://127.0.0.1:8080/actuator/info. Ожидается readiness UP, smoke PASS, оба контейнера healthy.
+В конце ожидается UP, PASS и healthy у двух контейнеров.
 
-`init-env.sh` создаёт .env со случайным паролем и сохраняет существующую конфигурацию. .env.example содержит только параметры без секретов. Переменные: DB_NAME, DB_USER, DB_PASSWORD, APP_IMAGE, APP_BIND, APP_PORT; приложение принимает DB_URL и SERVER_PORT. По умолчанию порт доступен на loopback. В VirtualBox этот адрес относится к Kali; доступ с хоста требует проброса порта и настройки APP_BIND. Скрипты проверок используют BASE_URL, по умолчанию http://127.0.0.1:8080.
+Открыть Swagger в браузере Kali: http://127.0.0.1:8080/swagger-ui/index.html. Там можно отправлять запросы и смотреть ответы.
 
-Остановка: `docker compose down`; повторный запуск: `docker compose up -d --no-build --wait --wait-timeout 180`. Том PostgreSQL сохраняется; `down -v` удаляет его. Для обновления исходников и локального образа: `git pull --ff-only`, затем `docker compose up -d --build --wait`. Демонстрационные данные создаёт `python3 scripts/seed-demo.py`; повторный запуск добавляет записи.
+Адрес http://127.0.0.1:8080/v3/api-docs возвращает описание API, а http://127.0.0.1:8080/actuator/info — версию приложения.
 
-## 2. Требования и критерии приёмки
+Скрипт init-env.sh создаёт файл .env со случайным паролем базы. Если файл уже есть, он сохраняется. Пример настроек лежит в .env.example, пароля там нет. .env не попадает в Git.
 
-| История / требование | Потребность и проверяемый результат |
-| --- | --- |
-| US-01 / F-01 | Сотрудник создаёт заявку: 201, Location, id, NEW, createdAt и начальная история. Неверные поля или категория — 400 без вставки. |
-| US-02 / F-02 | Оператор получает карточку и категории; отсутствующая заявка — 404 с единым JSON ошибки. |
-| US-03 / F-03 | Оператор меняет description, priority, dueAt открытой заявки; null снимает срок. Для RESOLVED/CANCELLED — 409, данные сохраняются. |
-| US-04 / F-04 | Оператор меняет статус по схеме ниже. Терминальный статус заполняет closedAt; повтор того же статуса и открытие закрытой заявки дают 409. |
-| US-05 / F-05 | История упорядочена по id; смена статуса и запись истории атомарны. Ошибка истории откатывает статус и closedAt. |
-| US-06 / F-06 | Поиск комбинирует status, priority, categoryId, overdue, from, to через AND. page от 0, size 1–100; сортировка createdAt DESC, id DESC. |
-| US-07 / F-08 | Руководитель получает сводку по одной выборке [from,to). Среднее только для RESOLVED; без завершённых — null. Неверный период — 400. |
-| US-08 / N-02 | После пересоздания контейнеров данные сохраняются; backup восстанавливается в отдельную БД, все три таблицы совпадают с исходными. |
-| US-09 | Администратор получает проверенный образ через CI/CD; PR проходит проверки, main доставляется на стенд; доступен возврат прежнего образа. |
+В .env задаются DB_NAME, DB_USER, DB_PASSWORD, APP_IMAGE, APP_BIND и APP_PORT. Приложение также принимает DB_URL и SERVER_PORT. Адрес для проверочных скриптов можно поменять через BASE_URL. По умолчанию используется http://127.0.0.1:8080.
 
-Дополнительные правила: title обязателен, максимум 200 символов; categoryId должен существовать; priority — LOW, MEDIUM или HIGH и обязателен. description по умолчанию пустая строка, максимум 10000 символов; dueAt необязателен. PUT заменяет description, priority и dueAt, сохраняя заголовок и категорию. F-07: просрочка означает открытый статус и dueAt < now; ровно в dueAt просрочки ещё нет. F-09: валидация — 400, неизвестная заявка — 404, запрещённая операция — 409.
+Для остановки выполнить `docker compose down`, для повторного запуска — `docker compose up -d --no-build --wait --wait-timeout 180`. Ключ down -v удаляет данные базы. Изменение DB_PASSWORD в .env не меняет пароль уже созданной базы.
 
-Нефункциональные требования: N-01 — воспроизводимый запуск и закреплённые версии; N-02 — постоянный том; N-03 — окружение и Secrets, .env исключён из Git; N-04 — stdout-логи, readiness с проверкой БД и непривилегированный пользователь контейнера; N-05 — UTC/Instant и управляемый Clock; N-06 — PostgreSQL Testcontainers, JUnit/JaCoCo и форматирование; N-07 — loopback по умолчанию; N-08 — ограничения памяти app 768 MiB и db 512 MiB. Численный SLA нагрузки не задан; нагрузочное тестирование не входит в объём.
+Для обновления локальной сборки выполнить `git pull --ff-only`, затем `docker compose up -d --build --wait`. В VirtualBox адрес 127.0.0.1 относится к Kali. Для доступа из основной ОС нужен проброс порта и настройка APP_BIND.
 
-## 3. Процесс и данные
+## Что должно работать
 
-```mermaid
-flowchart LR
-    A{Данные корректны?} -->|да| N[NEW]
-    A -->|нет| E[400 при ошибке]
-    N --> I[IN_PROGRESS]
-    I --> R[RESOLVED]
-    N --> C[CANCELLED]
-    I --> C
-    R --> X[Редактирование и открытие запрещены: 409]
-    C --> X
-```
+1. Сотрудник создаёт заявку. В ответ приходит 201, новый id и статус NEW. Пустой заголовок или неверная категория дают 400, заявка не создаётся.
+2. Оператор открывает заявку по id. Если её нет, приходит 404. Список категорий доступен отдельным запросом.
+3. Оператор меняет описание, приоритет и срок. У открытой заявки изменения сохраняются. У завершённой или отменённой заявки приходит 409, данные остаются прежними.
+4. Оператор меняет статус. Новую заявку можно взять в работу, затем завершить. Отмена доступна для новой заявки и заявки в работе. Повторное открытие запрещено.
+5. Оператор смотрит историю. Создание и каждая смена статуса записываются по порядку. Если история не сохранилась, статус тоже не должен измениться.
+6. Оператор ищет заявки по статусу, приоритету, категории, просрочке и времени создания. Фильтры работают вместе. Страницы начинаются с 0, размер — от 1 до 100.
+7. Руководитель получает отчёт за период. В нём число созданных заявок, распределение по статусам и приоритетам, просроченные открытые заявки и среднее время решения. Неверный период даёт 400.
+8. Администратор перезапускает контейнеры и восстанавливает копию в отдельную базу. Заявки и история сохраняются, данные восстановленной базы совпадают с исходными.
+9. Новая версия проходит проверки на GitHub, публикуется и запускается на стенде. При ошибке тестов следующие этапы не запускаются. Предыдущую версию можно вернуть.
 
-```mermaid
-erDiagram
-    categories ||--o{ tickets : category_id
-    tickets ||--|{ status_history : ticket_id
-    categories {
-        bigint id PK
-        varchar name UK
-    }
-    tickets {
-        bigint id PK
-        varchar title
-        text description
-        bigint category_id FK
-        varchar priority
-        varchar status
-        timestamptz created_at
-        timestamptz due_at
-        timestamptz closed_at
-    }
-    status_history {
-        bigint id PK
-        bigint ticket_id FK
-        varchar from_status
-        varchar to_status
-        timestamptz changed_at
-    }
-```
+Заголовок обязателен и содержит не больше 200 символов. Категория должна существовать. Приоритет обязателен: LOW, MEDIUM или HIGH. Описание по умолчанию пустое, максимум 10000 символов. Срок можно не задавать.
 
-Схема и справочник создаются [миграциями Flyway](src/main/resources/db/migration). Начальная история: fromStatus=null, toStatus=NEW. Внешние ключи и CHECK-ограничения обеспечивают целостность. Индексы поддерживают поиск по времени, статусу/сроку, категории/приоритету и истории. JdbcTemplate выполняет параметризованные SQL-запросы; SELECT FOR UPDATE сериализует изменения заявки, @Transactional объединяет смену статуса и историю.
+Заявка проходит статусы NEW, IN_PROGRESS, RESOLVED. Отмена переводит её в CANCELLED. Из RESOLVED и CANCELLED нельзя вернуться назад или изменить заявку. При завершении и отмене заполняется время закрытия.
 
-## 4. REST API
+Просроченной считается открытая заявка, у которой срок уже прошёл. Ровно в момент срока просрочки ещё нет. Заявка без срока или с закрытым статусом не считается просроченной.
 
-JSON, время ISO-8601 с часовым поясом. Полный контракт: [OpenAPI JSON](api/openapi.json); проверочные запросы: [коллекция Postman](api/helpdesk.postman_collection.json). В Postman запросы выполняются по порядку, ticketId сохраняется автоматически. Примеры времени ниже иллюстративны.
+Запуск должен повторяться через Compose. Данные базы лежат в отдельном томе, логи доступны через Docker. Проверка готовности учитывает соединение с базой. Время хранится в UTC, в тестах оно задаётся через Clock. Порт по умолчанию доступен только на самой машине. Память ограничена: 768 MiB для приложения и 512 MiB для базы.
 
-| Метод и путь | Запрос | Успешный ответ |
-| --- | --- | --- |
-| POST /api/tickets | title, description, categoryId, priority, dueAt | 201 + Location, Ticket |
-| GET /api/tickets/{id} | id | 200, Ticket |
-| PUT /api/tickets/{id} | description, priority, dueAt | 200, Ticket |
-| PATCH /api/tickets/{id}/status | status | 200, Ticket |
-| GET /api/tickets | Фильтры, page, size | 200, TicketPage |
-| GET /api/tickets/{id}/history | id | 200, массив истории |
-| GET /api/categories | — | 200, массив категорий |
-| GET /api/reports/summary | from, to обязательны; from < to | 200, SummaryReport |
-| GET /actuator/health/readiness | — | 200 UP или 503 |
-| GET /actuator/info | — | 200, версия образа |
+## Как хранятся данные
 
-POST /api/tickets:
+В базе три таблицы:
+
+- categories — id и название категории;
+- tickets — id, заголовок, описание, категория, приоритет, статус, время создания, срок и время закрытия;
+- status_history — id записи, id заявки, прежний и новый статус, время изменения.
+
+У одной категории может быть много заявок, у одной заявки — много записей истории. В первой записи прежний статус пустой, новый — NEW. База проверяет связи между записями и допустимые значения полей. Индексы помогают искать заявки и историю.
+
+Таблицы и категории создаёт Flyway при запуске. Файлы находятся в [src/main/resources/db/migration](src/main/resources/db/migration).
+
+Запросы выполняет JdbcTemplate. Значения передаются отдельно от текста SQL. При изменении заявки используется SELECT FOR UPDATE: два запроса не меняют одну строку одновременно. @Transactional связывает изменение статуса и добавление истории в одну операцию.
+
+## Запросы API
+
+Запросы и ответы используют JSON. Даты записываются с часовым поясом. Полное описание находится в [api/openapi.json](api/openapi.json), готовые запросы — в [коллекции Postman](api/helpdesk.postman_collection.json). В Postman нужно выполнять их по порядку: id созданной заявки сохраняется сам.
+
+Основные адреса:
+
+- POST /api/tickets — создать заявку, ответ 201 и адрес новой заявки в Location.
+- GET /api/tickets/{id} — получить заявку, ответ 200 или 404.
+- PUT /api/tickets/{id} — изменить description, priority и dueAt, ответ 200; закрытая заявка даёт 409.
+- PATCH /api/tickets/{id}/status — изменить status, ответ 200 или 409.
+- GET /api/tickets — получить список с фильтрами и страницами, ответ 200.
+- GET /api/tickets/{id}/history — получить историю, ответ 200 или 404.
+- GET /api/categories — получить категории, ответ 200.
+- GET /api/reports/summary — получить отчёт, ответ 200; нужны from и to, начало должно быть раньше конца.
+- GET /actuator/health/readiness — проверить готовность, ответ 200 UP или 503.
+- GET /actuator/info — посмотреть версию, ответ 200.
+
+Пример создания заявки:
 
 ```json
 {"title":"Не работает принтер","description":"Кабинет 104","categoryId":1,"priority":"HIGH","dueAt":"2030-01-20T16:00:00Z"}
 ```
 
-Ticket в ответах POST/GET/PUT/PATCH:
+Пример ответа. Даты здесь приведены для образца, время создания сервер ставит сам:
 
 ```json
 {"id":1,"title":"Не работает принтер","description":"Кабинет 104","categoryId":1,"priority":"HIGH","status":"NEW","createdAt":"2030-01-15T10:00:00Z","dueAt":"2030-01-20T16:00:00Z","closedAt":null}
 ```
 
-Примеры PUT и PATCH соответственно:
+GET возвращает такую же карточку. PUT и PATCH возвращают её с новыми значениями. Для PUT можно отправить:
 
 ```json
 {"description":"Заменить кабель","priority":"MEDIUM","dueAt":null}
 ```
 
+null снимает срок. Заголовок и категория при этом сохраняются. Для PATCH:
+
 ```json
 {"status":"IN_PROGRESS"}
 ```
 
-GET /api/tickets?status=NEW&priority=HIGH&categoryId=1&overdue=true&page=0&size=20:
+Пример списка: GET /api/tickets?status=NEW&priority=HIGH&categoryId=1&overdue=true&page=0&size=20.
 
 ```json
 {"content":[],"page":0,"size":20,"totalElements":0,"totalPages":0}
 ```
 
-Элементы content имеют структуру Ticket. from включается, to исключается. overdue=false включает заявки без срока и терминальные заявки; за последней страницей content пустой.
+В content находятся карточки заявок. Новые заявки идут первыми; при одинаковом времени порядок задаётся по id. Фильтр from включает начало периода, to исключает конец. overdue=false включает заявки без срока и закрытые заявки. За последней страницей возвращается пустой список.
 
-Примеры ответов категорий и истории:
+Пример категорий:
 
 ```json
 [{"id":1,"name":"Оборудование"},{"id":2,"name":"Программное обеспечение"},{"id":3,"name":"Сеть"}]
 ```
 
+Пример записи истории:
+
 ```json
 [{"id":1,"ticketId":1,"fromStatus":null,"toStatus":"NEW","changedAt":"2030-01-15T10:00:00Z"}]
 ```
 
-GET /api/reports/summary?from=2030-01-01T00:00:00Z&to=2030-02-01T00:00:00Z:
+Пример отчёта: GET /api/reports/summary?from=2030-01-01T00:00:00Z&to=2030-02-01T00:00:00Z.
 
 ```json
 {"from":"2030-01-01T00:00:00Z","to":"2030-02-01T00:00:00Z","createdCount":3,"byStatus":{"NEW":1,"IN_PROGRESS":0,"RESOLVED":1,"CANCELLED":1},"byPriority":{"LOW":1,"MEDIUM":1,"HIGH":1},"overdueOpenCount":1,"averageResolutionSeconds":180.0}
 ```
 
-Все показатели используют заявки, созданные в [from,to). Статусы берутся текущие; просрочка определяется на момент запроса. Среднее — closedAt-createdAt только для RESOLVED, в секундах с дробной частью. Пустая выборка возвращает нули и среднее null. Все статусы и приоритеты присутствуют, включая нулевые значения.
+Все числа отчёта считаются по заявкам, созданным от from включительно до to не включительно. Статусы берутся текущие. Просрочка проверяется на момент запроса. Среднее время считается только для RESOLVED как время закрытия минус время создания, в секундах. CANCELLED в среднем не участвуют. Если завершённых заявок нет, среднее равно null. У отсутствующих статусов и приоритетов стоят нули.
 
-Единый формат ошибки:
+Ошибки имеют один формат:
 
 ```json
 {"timestamp":"2030-01-15T11:00:00Z","status":409,"code":"INVALID_TRANSITION","message":"Переход статуса запрещён","path":"/api/tickets/1/status","violations":{}}
 ```
 
-Bean Validation возвращает VALIDATION_ERROR с violations; неверный JSON, enum или параметр — INVALID_REQUEST; отсутствующая заявка — TICKET_NOT_FOUND. Неположительный id и неизвестные поля JSON отвергаются с 400.
+Неверные поля и параметры дают 400, отсутствующая заявка — 404, запрещённая операция — 409. В violations перечисляются ошибки полей. Неизвестные поля JSON и неположительный id тоже дают 400.
 
-## 5. Java, Kotlin и тестирование
+## Java и Kotlin
 
-Java-контроллер ReportController вызывает Kotlin ReportService, который читает данные через Java-интерфейс ReportSource и JdbcTemplate-репозиторий TicketRepository. Все компоненты работают в одном JVM-приложении.
+ReportController написан на Java. Он вызывает ReportService на Kotlin. Сервис получает заявки через Java-интерфейс ReportSource и Java-класс TicketRepository. Всё работает в одном приложении, отдельный запрос по сети между языками не нужен.
 
-Два решения Kotlin: (1) data class SummaryReport и nullable Double? представляют модель и отсутствие среднего; ?.let, mapNotNull и takeIf безопасно обрабатывают отсутствующие значения и пустой набор; (2) groupingBy().eachCount(), associateWith, filter и average рассчитывают метрики из одной выборки, дополняя отсутствующие значения нулями. Kotlin-тест kotlinInvokesJavaServiceAndEnforcesTerminalStatus проверяет Java TicketService.
+В Kotlin использованы два основных решения:
+
+1. Модель отчёта — data class SummaryReport. Поле среднего имеет тип Double?, поэтому может содержать null. Безопасные вызовы ?.let, mapNotNull и takeIf обрабатывают отсутствующее время закрытия и пустой список.
+2. groupingBy().eachCount() считает заявки по группам, associateWith добавляет нули, filter и average считают среднее по завершённым заявкам. Данные для всех чисел берутся из одного списка.
+
+На Kotlin написано восемь тестов. Тест kotlinInvokesJavaServiceAndEnforcesTerminalStatus вызывает Java TicketService и проверяет запрет открытия закрытой заявки.
+
+## Проверка проекта
+
+На Kali выбрать Java 21 и запустить:
 
 ```bash
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
@@ -193,48 +197,36 @@ export PATH="$JAVA_HOME/bin:$PATH"
 ./gradlew --no-daemon spotlessCheck build
 ```
 
-Требуются работающий Docker и JDK 21; Gradle установленный в системе не нужен. Testcontainers поднимает отдельную PostgreSQL 17.6; рабочая БД не используется. Время задаётся через Clock.fixed/MutableClock; перед интеграционными тестами очищаются заявки и история, сбрасываются идентификаторы и часы. Исправление форматирования: `./gradlew spotlessApply`.
+Docker должен работать. Testcontainers сам создаёт отдельную PostgreSQL для тестов, рабочая база приложения не используется. Время в тестах задано через Clock, перед каждым тестом API заявки и история очищаются. Spotless проверяет оформление Java и Kotlin. Исправить оформление можно командой `./gradlew spotlessApply`.
 
-Тест-план и связь с критериями приёмки:
+Проверки добавлены, что бы ошибки находились до запуска новой версии. План проверки связан с пунктами из раздела «Что должно работать»:
 
-| Требование | Проверка и ожидаемый результат |
-| --- | --- |
-| F-01,02 / US-01,02 | validatesRequiredTitleCategoryAndPriority, createsWithInitialHistoryAndReturnsSameRecord, returnsUniform404ForMissingTicketAndHistory: 201/400/404, верные поля и история |
-| F-03,04 / US-03,04 | enforcesEveryTransition: все 16 пар; cancellationIsAllowedFromBothOpenStatuses; editsOpenTicketAndClearsDeadline: разрешённые операции сохраняются, запреты дают 409 |
-| F-05 / US-05 | historyFailureRollsBackStatusAndClosingTime: ошибка истории откатывает запись; concurrentDuplicateTransitionWritesExactlyOneHistoryEntry: один успешный переход при двух запросах |
-| F-06 / US-06 | filtersWithStablePaginationAndCorrectDeadlineBoundary: AND-фильтры, стабильные страницы, правильные totalElements и граница срока |
-| F-07 | deadlineEqualityIsNotOverdueRegression, deadlineOneNanosecondEarlierIsOverdue, missingDeadlineIsNotOverdue: равный/будущий/null срок без просрочки |
-| F-08 / US-07 | summaryUsesHalfOpenCreatedPeriodForEveryMetric, emptySelectionHasZeroCountsAndNullAverage, rejectsEqualAndReversedPeriods: одна выборка, нули/null, отказ неверному периоду |
-| F-08 / D-01 | preservesSubMillisecondResolutionRegression: длительность 0,0005 секунды сохраняется |
-| F-09 | validatesBodiesUnknownEnumsAndPagination: неверные поля, enum, категория и страница дают 400 |
-| Сквозные сценарии | e2eFullLifecycleProducesReportAndOrderedHistory; e2eForbiddenOperationLeavesAllDataUnchanged: жизненный цикл и полное совпадение карточки/истории после запрета |
-| US-08,09 | verify-storage.py, smoke.py, workflow и rollback.sh: сохранность, восстановление, успешная доставка и возврат версии |
+- Пункты 1 и 2: обязательные поля, создание с историей, категории и 404. Проверяются в StatusRulesTest и ApiIntegrationTest.
+- Пункты 3 и 4: изменение открытой заявки, запрет изменения закрытой и все 16 пар статусов. Проверяются в TicketServiceTest, StatusRulesTest и ApiIntegrationTest.
+- Пункт 5: ошибка вставки истории должна отменять смену статуса. Два одинаковых одновременных запроса должны дать только один успешный переход. Это проверяют historyFailureRollsBackStatusAndClosingTime и concurrentDuplicateTransitionWritesExactlyOneHistoryEntry.
+- Пункт 6: несколько фильтров вместе, страницы, порядок и срок ровно в момент проверки. Тест filtersWithStablePaginationAndCorrectDeadlineBoundary.
+- Пункт 7: пустой список, отсутствие завершённых заявок, неверный период и общая выборка для всех чисел. Проверяются в ReportServiceTest и ApiIntegrationTest.
+- Отдельно проверены срок без значения, уже закрытые заявки и срок ровно сейчас. Тест deadlineEqualityIsNotOverdueRegression проверяет границу срока.
+- Два полных сценария — e2eFullLifecycleProducesReportAndOrderedHistory и e2eForbiddenOperationLeavesAllDataUnchanged. Во втором сравниваются вся карточка и вся история после запрещённых действий.
+- Пункты 8 и 9 проверяются scripts/verify-storage.py, scripts/smoke.py, pipeline и scripts/rollback.sh.
 
-Критерий прохождения: ноль ошибок и пропусков, readiness UP, smoke и проверка восстановления PASS. Результаты от 15 ноября 2026 года:
+Результаты от 15 ноября 2026 года: всего 56 тестов, ошибок и пропусков нет. Из них 22 в StatusRulesTest, 11 в TicketServiceTest, 8 в ReportServiceTest на Kotlin и 15 в ApiIntegrationTest. Два теста API проверяют полный путь от HTTP-запроса до базы.
 
-| Класс | Тестов | Падений / ошибок / пропусков |
-| --- | --- | --- |
-| StatusRulesTest | 22 | 0 / 0 / 0 |
-| TicketServiceTest | 11 | 0 / 0 / 0 |
-| ReportServiceTest, Kotlin | 8 | 0 / 0 / 0 |
-| ApiIntegrationTest | 15 | 0 / 0 / 0 |
-| Всего | 56 | 0 / 0 / 0 |
+По JaCoCo выполнено 219 из 224 строк, это 97,77%. Покрытие ветвей — 96,51%, инструкций — 98,10%. [Отчёты JUnit и JaCoCo](evidence/reports/index.html), [общий результат](evidence/verification.json).
 
-Из 15 интеграционных методов два — сквозные сценарии HTTP → PostgreSQL. JaCoCo: строки 219/224 (97,77%), ветви 83/86 (96,51%), инструкции 1290/1315 (98,10%). [Зафиксированные отчёты JUnit и JaCoCo](evidence/reports/index.html), [сводка](evidence/verification.json). После сборки: `build/reports/tests/test/index.html`, `build/reports/jacoco/test/html/index.html`, `build/test-results/test`.
+После новой сборки отчёты находятся в build/reports/tests/test/index.html, build/reports/jacoco/test/html/index.html и build/test-results/test. Проверка считается пройденной, когда тесты не падают и не пропускаются, readiness возвращает UP, smoke и восстановление копии дают PASS.
 
-Исправленные дефекты:
+## Найденные ошибки
 
-| ID | Воспроизведение и результат до исправления | Исправление и проверка |
-| --- | --- | --- |
-| D-01 | Передать RESOLVED с createdAt=2025-01-01T00:00:00Z и closedAt=2025-01-01T00:00:00.000500Z, получить summary: ожидалось 0.0005, возвращалось 0.0 | toMillis заменён на seconds + nano / 1e9. Регрессия preservesSubMillisecondResolutionRegression проходит; [протокол до исправления](evidence/defect-D01-before.txt) |
-| D-02 | Запустить контейнер с HTTP-прокси: внешний readiness UP, внутренний wget получает 403, Compose не дожидается healthy | Локальный health check использует wget -Y off; readiness UP и smoke PASS |
-| D-03 | Отправить первоначальный workflow в main: YAML с разорванной строкой printf завершается до jobs | Однострочный printf; YAML проверен, [PR №1](https://github.com/Zuika1166/practika_ychhhh/pull/1) и pipeline успешны |
+D-01. Если завершённая заявка была решена за 0,0005 секунды, отчёт раньше возвращал 0. Для повторения нужно передать ReportSource заявку с createdAt=2025-01-01T00:00:00Z и closedAt=2025-01-01T00:00:00.000500Z, затем получить отчёт. Причина — toMillis() отбрасывал долю миллисекунды. Расчёт заменён на seconds + nano / 1e9. Тест preservesSubMillisecondResolutionRegression до исправления падал, после проходит. [Результат до исправления](evidence/defect-D01-before.txt).
 
-## 6. Эксплуатация, CI/CD и откат
+D-02. При запуске с HTTP-прокси внешний запрос готовности возвращал UP, а wget внутри контейнера получал 403. Из-за этого Compose не дожидался healthy. Для локальной проверки добавлен wget -Y off. После исправления получены UP и PASS.
 
-Dockerfile многоэтапный: сборка в JDK, runtime — JRE и JAR от непривилегированного пользователя. Compose задаёт постоянный том, health checks, ограничения памяти, окружение и зависимость app от готовности db. Миграции Flyway применяются автоматически; логи направляются в stdout/stderr.
+D-03. В первой настройке GitHub Actions строка printf была разбита так, что YAML не читался. Для повторения достаточно было отправить старый файл в main: jobs не запускались. Команда переписана в одну строку. [PR с исправлением](https://github.com/Zuika1166/practika_ychhhh/pull/1) и последующий запуск прошли успешно.
 
-Из рабочего каталога Compose:
+## Резервная копия
+
+Команды выполнять из каталога работающего Compose:
 
 ```bash
 bash scripts/backup.sh backups/manual.dump
@@ -242,11 +234,29 @@ bash scripts/restore.sh backups/manual.dump helpdesk_restore_check
 python3 scripts/verify-storage.py
 ```
 
-Backup — pg_dump custom-format. Restore создаёт отдельную новую базу и отказывается перезаписывать рабочую. verify-storage.py кратковременно пересоздаёт контейнеры, проверяет заявку и историю, восстанавливает копию и сравнивает categories, tickets и status_history целиком. Рабочие данные сохраняются.
+Копия создаётся через pg_dump. Восстановление идёт в новую отдельную базу; рабочая база не перезаписывается. Если имя уже занято, нужно выбрать другое.
 
-[Workflow](.github/workflows/ci-cd.yaml): verify проверяет форматирование и тесты, публикует отчёты; publish собирает образ с тегом полного SHA и отправляет в GHCR; deploy запускает его на учебной ВМ, проверяет readiness и smoke и публикует протокол. PR получает только проверки, после слияния в main выполняется доставка. Связь через needs блокирует следующие этапы при ошибке проверки. Локальная последовательность без registry: `bash scripts/local-pipeline.sh`.
+verify-storage.py создаёт заявку, пересоздаёт контейнеры, сверяет заявку и историю, делает копию, восстанавливает её и сравнивает все строки трёх таблиц. На время проверки приложение останавливается. Ожидается PASS, restartPreservedData=true и allTablesMatch=true.
 
-Стенд: /opt/helpdesk, runner с метками self-hosted/linux/x64/helpdesk-kali, GitHub environment training, variable STAND_DIR=/opt/helpdesk, secret DB_PASSWORD с действующим паролем базы. Каталог принадлежит пользователю runner с доступом к Docker. Runner регистрируется через GitHub Settings → Actions → Runners. GITHUB_TOKEN используется для GHCR. .env сохраняется между доставками; для нового тома пароль можно создать командой `openssl rand -hex 24`. При переносе работающей конфигурации требуется сохранить .env и пароль существующего тома.
+## Сборка и доставка через GitHub
+
+В Dockerfile два этапа: на первом JDK собирает проект, на втором остаются JRE и JAR. Приложение запускается без прав root. Compose отдельно запускает PostgreSQL, хранит данные в томе и проверяет готовность. Flyway применяет изменения базы при старте, логи идут в вывод контейнеров.
+
+В [файле pipeline](.github/workflows/ci-cd.yaml) три задания:
+
+- verify — оформление кода, сборка, тесты и сохранение отчётов;
+- publish — сборка Docker-образа и публикация в GHCR с тегом коммита;
+- deploy — запуск образа на Kali и проверка готовности и работы API.
+
+В pull request запускаются только проверки. После слияния в main выполняются публикация и доставка. needs связывает задания: ошибка тестов блокирует следующие этапы. Локальная проверка со сборкой и запуском доступна через `bash scripts/local-pipeline.sh`.
+
+Runner — программа на Kali, которая получает задания GitHub. У неё стоят метки self-hosted, linux, x64 и helpdesk-kali. Настройка находится в GitHub Settings → Actions → Runners.
+
+В GitHub environment training заданы variable STAND_DIR=/opt/helpdesk и secret DB_PASSWORD с действующим паролем базы. Runner должен иметь доступ к Docker и каталогу /opt/helpdesk. Для GHCR используется GITHUB_TOKEN. .env сохраняется между доставками. Для новой базы пароль можно создать командой `openssl rand -hex 24`; для существующей нужен её текущий пароль.
+
+## Возврат старой версии
+
+На стенде сохранены две версии. Во второй добавлена метка practice-2 в /actuator/info. База и правила обработки заявок не менялись.
 
 ```bash
 cd /opt/helpdesk
@@ -256,55 +266,76 @@ curl --fail http://127.0.0.1:8080/actuator/info
 python3 scripts/smoke.py
 ```
 
-Без аргумента rollback использует .deploy/previous-image. deploy сохраняет текущий образ в .deploy/current-image и .env; flock защищает от одновременных запусков. Неуспешные readiness или smoke вызывают попытку возврата прежнего образа и ошибку доставки. Для скачивания отсутствующего локально приватного образа нужна авторизация в GHCR. Откат образа сохраняет БД; миграции должны быть совместимы с предыдущим кодом. В проверенных версиях схема одинаковая; practice-2 добавляет поле release в /actuator/info. Restore данных — отдельная операция.
+Без указанного образа rollback берёт .deploy/previous-image. Текущий образ записывается в .deploy/current-image и .env. flock не даёт запустить две доставки одновременно. Если новая версия не проходит проверку, скрипт пробует вернуть старую и сообщает об ошибке доставки. Для скачивания приватного образа, которого нет на машине, нужен вход в GHCR.
 
-Диагностика трёх сбоев:
+При возврате образа данные базы сохраняются. Будущие изменения базы должны подходить и предыдущей версии приложения. Восстановление базы из копии выполняется отдельной командой.
 
-| Ситуация | Проверка и действия |
-| --- | --- |
-| БД недоступна | docker compose ps; docker compose logs --tail=100 db app; pg_isready внутри db. Проверить DB_URL, пользователя, пароль и диск. Правка .env не меняет пароль существующего тома. |
-| Приложение не проходит health check | Логи app, доступ к БД, память и порт; curl -i /actuator/health/readiness по базовому адресу. 503 — неготовность, connection refused — отсутствие доступного сервиса. |
-| Ошибка миграции | Логи app и flyway_schema_history; проверить SQL, права и checksum. Применённый файл восстановить в исходном виде, исправление оформить новой миграцией после backup и проверки на отдельной базе. |
+## Если что-то не запускается
+
+Сначала проверить контейнеры и логи:
 
 ```bash
 docker compose ps
 docker compose logs --tail=100 app db
+```
+
+Если недоступна база, проверить её состояние, адрес DB_URL, пользователя, пароль и место на диске:
+
+```bash
 docker compose exec db sh -c 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+```
+
+Если приложение не проходит проверку готовности, посмотреть логи app, доступ к базе, память и порт:
+
+```bash
+curl -i http://127.0.0.1:8080/actuator/health/readiness
 docker inspect --format '{{json .State.Health}}' "$(docker compose ps -q app)"
+```
+
+503 означает, что приложение не готово. Connection refused означает, что по этому адресу нет доступного сервиса.
+
+Если ошибка в изменении схемы базы, посмотреть логи app и записи Flyway:
+
+```bash
 docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT installed_rank, version, description, success FROM flyway_schema_history ORDER BY installed_rank;"'
 ```
 
-## 7. Результаты развёртывания
+Нужно проверить SQL, права и проверочную сумму файла. Уже применённый файл должен оставаться прежним. Исправление делается новым файлом после резервной копии и проверки на отдельной базе. Рабочий том при поиске ошибки сохраняется.
 
-На Kali Linux в VirtualBox 15 ноября 2026 года подтверждены 56 тестов на JDK 21.0.13, работа API, сохранность после пересоздания контейнеров, восстановление копии и возврат предыдущего образа. [Протокол стенда](evidence/kali-verification.json).
+## Что проверено на стенде
 
-| Версия | SHA и успешный pipeline |
-| --- | --- |
-| Первая | `9eb5ae4585c0965e3387c79b7f47836b89136ac2` — [run](https://github.com/Zuika1166/practika_ychhhh/actions/runs/43745510914), [PR №1](https://github.com/Zuika1166/practika_ychhhh/pull/1) |
-| practice-2 | `60a2ce4259cedce23de43eae00e409c6b3b4e04b` — [run](https://github.com/Zuika1166/practika_ychhhh/actions/runs/43756431655), [PR №2](https://github.com/Zuika1166/practika_ychhhh/pull/2) |
+15 ноября 2026 года на Kali Linux в VirtualBox прошли 56 тестов с JDK 21.0.13, запуск API, перезапуск контейнеров, восстановление копии и возврат первой версии. [Результат проверки](evidence/kali-verification.json).
 
-Образы: `ghcr.io/zuika1166/practika_ychhhh:<SHA>`. Digest manifest из логов публикации: первый — `sha256:27ce77f539f7766a7237b22a7a9e5042e15e8fe381da956a13b6dc0af16cece6`; второй — `sha256:108dc47bf75ec137a998f13fbb16b97258096ae48d15a5614fd67d4282b744dc`. Локальный RepoDigests доступен через docker image inspect.
+Первая версия: 9eb5ae4585c0965e3387c79b7f47836b89136ac2. [Успешный pipeline](https://github.com/Zuika1166/practika_ychhhh/actions/runs/43745510914), [PR №1](https://github.com/Zuika1166/practika_ychhhh/pull/1).
 
-Backup `backups/helpdesk-20261115T194643Z.dump` восстановлен в `restore_20261115194643`; совпали 4 заявки и 8 записей истории. После отката с practice-2 на первый образ сохранилась заявка №4, поле release исчезло, smoke создал заявки №8 и №9 с PASS, оба контейнера остались healthy. Дополнительная проверка [автоматического возврата при неуспешном health check](evidence/automatic-rollback.json) также завершилась PASS.
+Вторая версия: 60a2ce4259cedce23de43eae00e409c6b3b4e04b. [Успешный pipeline](https://github.com/Zuika1166/practika_ychhhh/actions/runs/43756431655), [PR №2](https://github.com/Zuika1166/practika_ychhhh/pull/2).
 
-Первую доставку пришлось повторить после остановки runner при выгрузке отчёта; вторую публикацию — после HTTP 429 Maven Central. Итоговые verify, publish и deploy обоих запусков успешны.
+Образы имеют адрес ghcr.io/zuika1166/practika_ychhhh:<SHA>. Их точные номера из логов публикации:
 
-## 8. Backlog и итоги практики
+- Первый: sha256:27ce77f539f7766a7237b22a7a9e5042e15e8fe381da956a13b6dc0af16cece6.
+- Второй: sha256:108dc47bf75ec137a998f13fbb16b97258096ae48d15a5614fd67d4282b744dc.
 
-| ID | Работа | Связь | Приоритет | План, академ. ч |
-| --- | --- | --- | --- | --- |
-| B-01 | Анализ, истории и критерии | US-01–09 | P0 | 6 |
-| B-02 | Схема, API, версии и Git | F-01–09 | P0 | 6 |
-| B-03 | Создание, карточка, категории | US-01,02 | P0 | 6 |
-| B-04 | Статусы, история, транзакции | US-04,05 | P0 | 7 |
-| B-05 | Редактирование и поиск | US-03,06 | P0 | 5 |
-| B-06 | Kotlin, статистика и взаимодействие | US-07 | P0 | 10 |
-| B-07 | Тесты, исправления, покрытие | Все | P0 | 12 |
-| B-08 | Docker, эксплуатация, backup/restore | US-08 | P0 | 8 |
-| B-09 | CI/CD и откат | US-09 | P0 | 8 |
-| B-10 | Документация и защита | Все | P1 | 4 |
-| Итого | | | | 72 |
+Это digest образов в GHCR. Номера скачанных образов доступны через docker image inspect.
 
-P0 — основной функционал и воспроизводимость; P1 — комплект сдачи. Порядок: анализ → проектирование → Java/Kotlin → тестирование → эксплуатация → CI/CD. Тесты и документация обновлялись вместе с реализацией. Фактические трудозатраты учитываются в журнале практики; таблица содержит плановые оценки.
+Копия backups/helpdesk-20261115T194643Z.dump восстановлена в базу restore_20261115194643. Совпали 4 заявки и 8 записей истории. После возврата первой версии сохранилась заявка №4, метка practice-2 исчезла, проверки создали заявки №8 и №9 и дали PASS. Оба контейнера остались healthy. [Проверка автоматического возврата при ошибке готовности](evidence/automatic-rollback.json) тоже дала PASS.
 
-Результат: реализован API Java, работающая статистика Kotlin, миграции, валидация, история и поиск; подготовлены тесты, отчёты, контейнеры, резервное копирование, две доставки и откат. Ограничения: отсутствуют аутентификация, назначения исполнителей, уведомления и вложения; отчёт отражает текущие состояния, нагрузочный SLA не задан. Исходники, тесты, миграции, коллекция API и машинные протоколы находятся в соответствующих каталогах репозитория.
+Первый запуск доставки пришлось повторить после остановки runner при сохранении отчёта. Во второй публикации Maven Central вернул 429, после повтора всё прошло. Итоговые verify, publish и deploy обоих запусков успешны.
+
+## План работы и итог
+
+План рассчитан на 72 академических часа. P0 — основные задачи, P1 — оформление результата.
+
+- B-01, анализ и истории: P0, 6 часов, пункты 1–9 требований.
+- B-02, база, API, версии и Git: P0, 6 часов.
+- B-03, создание, чтение и категории: P0, 6 часов, пункты 1 и 2.
+- B-04, статусы и история: P0, 7 часов, пункты 4 и 5.
+- B-05, изменение и поиск: P0, 5 часов, пункты 3 и 6.
+- B-06, Kotlin и отчёт: P0, 10 часов, пункт 7.
+- B-07, тесты, исправления и покрытие: P0, 12 часов, все пункты.
+- B-08, контейнеры и резервные копии: P0, 8 часов, пункт 8.
+- B-09, доставка и возврат версии: P0, 8 часов, пункт 9.
+- B-10, документация и защита: P1, 4 часа.
+
+Это плановые оценки. Фактическое время учитывается в журнале практики.
+
+В результате сделаны заявки, статусы, история, поиск, отчёт Kotlin, тесты, контейнеры и автоматическая доставка. Проверены две версии и возврат старой. Ограничения проекта: нет входа по учётным записям, назначения исполнителей, уведомлений и вложений. Отчёт показывает текущие статусы заявок. Проверка работы под большой нагрузкой не проводилась.
