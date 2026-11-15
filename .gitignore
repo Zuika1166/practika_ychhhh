@@ -8,3 +8,4 @@ backups/
 *.log
 .idea/
 *.iml
+/actions-runner/

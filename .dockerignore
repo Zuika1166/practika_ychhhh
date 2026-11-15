@@ -8,3 +8,4 @@ backups
 evidence
 docs
 *.zip
+/actions-runner/

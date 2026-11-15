@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-15",
+  "environment": "Kali Linux in VirtualBox on the user computer",
+  "evidenceSource": [
+    "Terminal output provided by the operator",
+    "GitHub Actions jobs and publish logs"
+  ],
+  "tests": {
+    "result": "PASS",
+    "count": 56,
+    "jdk": "21.0.13"
+  },
+  "storage": {
+    "result": "PASS",
+    "ticketId": 4,
+    "backup": "backups/helpdesk-20261115T194643Z.dump",
+    "restoredDatabase": "restore_20261115194643",
+    "restartPreservedData": true,
+    "allTablesMatch": true
+  },
+  "delivery": [
+    {
+      "sourceCommit": "9eb5ae4585c0965e3387c79b7f47836b89136ac2",
+      "run": "https://github.com/Zuika1166/practika_ychhhh/actions/runs/43745510914",
+      "verify": "success",
+      "publish": "success",
+      "deploy": "success"
+    },
+    {
+      "sourceCommit": "60a2ce4259cedce23de43eae00e409c6b3b4e04b",
+      "run": "https://github.com/Zuika1166/practika_ychhhh/actions/runs/43756431655",
+      "verify": "success",
+      "publish": "success",
+      "deploy": "success"
+    }
+  ],
+  "rollback": {
+    "result": "PASS",
+    "fromImage": "ghcr.io/zuika1166/practika_ychhhh:60a2ce4259cedce23de43eae00e409c6b3b4e04b",
+    "toImage": "ghcr.io/zuika1166/practika_ychhhh:9eb5ae4585c0965e3387c79b7f47836b89136ac2",
+    "infoMatchesFirstImage": true,
+    "preservedTicket": {
+      "id": 4,
+      "title": "Проверка сохранности",
+      "status": "NEW",
+      "createdAt": "2026-11-15T19:46:24.030370Z"
+    },
+    "smokeInsideRollback": {
+      "result": "PASS",
+      "ticketId": 8
+    },
+    "smokeAfterRollback": {
+      "result": "PASS",
+      "ticketId": 9
+    },
+    "appHealth": "healthy",
+    "databaseHealth": "healthy"
+  },
+  "actualStudentHours": null
+}
