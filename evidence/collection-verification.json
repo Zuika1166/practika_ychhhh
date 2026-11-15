@@ -1,0 +1,85 @@
+{
+  "result": "PASS",
+  "requests": [
+    {
+      "request": "01 Категории",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "02 Создать заявку",
+      "status": 201,
+      "result": "PASS"
+    },
+    {
+      "request": "03 Карточка",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "04 Редактирование",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "05 В работу",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "06 Завершить",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "07 История до запрета",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "08 Запрет повторного открытия",
+      "status": 409,
+      "result": "PASS"
+    },
+    {
+      "request": "09 Запрет редактирования",
+      "status": 409,
+      "result": "PASS"
+    },
+    {
+      "request": "10 Карточка не изменилась",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "11 История не изменилась",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "12 Фильтры",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "13 Отчёт Kotlin",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "request": "14 Неизвестная заявка",
+      "status": 404,
+      "result": "PASS"
+    },
+    {
+      "request": "15 Валидация",
+      "status": 400,
+      "result": "PASS"
+    },
+    {
+      "request": "16 Неверный период",
+      "status": 400,
+      "result": "PASS"
+    }
+  ]
+}

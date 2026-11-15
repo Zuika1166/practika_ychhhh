@@ -1,0 +1,11 @@
+{
+  "result": "PASS",
+  "previousImage": "helpdesk:healthy",
+  "releaseImage": "helpdesk:67aed1b2bf389697f5ca5d0fe4ce7b3919cdca52",
+  "previousImageId": "sha256:f8de24faa748f7b19af04808c0b2b59cccac2a49eaf13b556b3b191949f3e8c3",
+  "releaseImageId": "sha256:d0d7e019fb413fac92c9f6bd9476989a9b3fa24ea2677f3a7e60881f70fff34c",
+  "changes": "Release image adds the source revision label; application code and database schema are the same.",
+  "healthAfterRollback": "healthy",
+  "smokeAfterRollback": "PASS",
+  "remoteRegistryPublicationVerified": false
+}

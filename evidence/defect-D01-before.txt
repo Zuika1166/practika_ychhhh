@@ -1,0 +1,5 @@
+ReportServiceTest.preservesSubMillisecondResolutionRegression
+Expected: 0.0005
+Actual: 0.0
+Result: AssertionFailedError before the fix
+Corrected implementation: seconds + nano / 1_000_000_000.0
