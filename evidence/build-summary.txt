@@ -1,0 +1,4 @@
+Command: ./gradlew spotlessApply spotlessCheck clean build
+Result: BUILD SUCCESSFUL
+JUnit: 56 tests, 0 failures, 0 errors, 0 skipped
+Java and Kotlin business logic: JaCoCo HTML/XML in reports/coverage

@@ -1,0 +1,7 @@
+{
+  "result": "PASS",
+  "failedCandidate": "helpdesk:failure-check",
+  "restoredImage": "helpdesk:healthy",
+  "health": "healthy",
+  "deploymentReturnedFailure": true
+}

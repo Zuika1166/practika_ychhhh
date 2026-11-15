@@ -1,0 +1,22 @@
+{
+  "result": "PASS",
+  "ticketId": 13,
+  "report": {
+    "from": "2026-11-15T17:58:54.352809Z",
+    "to": "2026-11-15T18:09:54.352809Z",
+    "createdCount": 2,
+    "byStatus": {
+      "NEW": 0,
+      "IN_PROGRESS": 0,
+      "RESOLVED": 2,
+      "CANCELLED": 0
+    },
+    "byPriority": {
+      "LOW": 0,
+      "MEDIUM": 2,
+      "HIGH": 0
+    },
+    "overdueOpenCount": 0,
+    "averageResolutionSeconds": 0.0491445
+  }
+}

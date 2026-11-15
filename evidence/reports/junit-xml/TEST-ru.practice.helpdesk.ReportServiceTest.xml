@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="ru.practice.helpdesk.ReportServiceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-15T17:48:20.773Z" hostname="d0c3e6952e7d" time="0.075">
+  <properties />
+  <testcase name="noResolvedTicketsHaveNullAverage()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.041" />
+  <testcase name="preservesSubMillisecondResolutionRegression()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.002" />
+  <testcase name="kotlinInvokesJavaServiceAndEnforcesTerminalStatus()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.008" />
+  <testcase name="checksJavaTicketDeadlineBoundary()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.003" />
+  <testcase name="safelyHandlesMissingCloseTimeFromJavaInterface()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.001" />
+  <testcase name="emptySelectionHasZeroCountsAndNullAverage()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.002" />
+  <testcase name="calculatesAllMetricsFromOneSelectionAndIgnoresCancellationDuration()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.002" />
+  <testcase name="rejectsEqualAndReversedPeriods()" classname="ru.practice.helpdesk.ReportServiceTest" time="0.002" />
+  </testsuite>

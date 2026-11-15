@@ -1,0 +1,70 @@
+{
+  "tests": [
+    {
+      "name": "ru.practice.helpdesk.TicketServiceTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "ru.practice.helpdesk.StatusRulesTest",
+      "tests": "22",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "ru.practice.helpdesk.ApiIntegrationTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "ru.practice.helpdesk.ReportServiceTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "totalTests": 56,
+  "coverage": {
+    "INSTRUCTION": {
+      "covered": 1290,
+      "missed": 25
+    },
+    "BRANCH": {
+      "covered": 83,
+      "missed": 3
+    },
+    "LINE": {
+      "covered": 219,
+      "missed": 5
+    },
+    "COMPLEXITY": {
+      "covered": 104,
+      "missed": 6
+    },
+    "METHOD": {
+      "covered": 73,
+      "missed": 3
+    },
+    "CLASS": {
+      "covered": 19,
+      "missed": 0
+    }
+  },
+  "integrationDatabase": "PostgreSQL 17.6 via Testcontainers",
+  "environment": "Linux x86_64, Java 21, Docker rootless 29.9.2, Compose 2.40.3",
+  "externalGitHubActionsRun": null,
+  "virtualBoxOnUserComputerVerified": false,
+  "containerReadiness": "UP",
+  "restApiSmoke": "PASS",
+  "postmanSequence": "16/16 PASS",
+  "restartPersistence": "PASS",
+  "backupRestoreAllTables": "PASS",
+  "manualImageRollback": "PASS",
+  "automaticRollbackOnUnhealthyImage": "PASS"
+}

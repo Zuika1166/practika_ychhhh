@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="ru.practice.helpdesk.ApiIntegrationTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-11-15T17:48:15.178Z" hostname="d0c3e6952e7d" time="4.433">
+  <properties />
+  <testcase name="rejectsInvalidPeriodsAndMissingReportArguments()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="1.597" />
+  <testcase name="cancellationIsAllowedFromBothOpenStatuses()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.416" />
+  <testcase name="editsOpenTicketAndClearsDeadline()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.092" />
+  <testcase name="historyFailureRollsBackStatusAndClosingTime()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.131" />
+  <testcase name="filtersWithStablePaginationAndCorrectDeadlineBoundary()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.136" />
+  <testcase name="concurrentDuplicateTransitionWritesExactlyOneHistoryEntry()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.057" />
+  <testcase name="createsWithInitialHistoryAndReturnsSameRecord()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.048" />
+  <testcase name="summaryHandlesEmptyAndNoResolvedSelections()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.071" />
+  <testcase name="appliesRealPostgresMigrationsAndLoadsCategories()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.032" />
+  <testcase name="e2eFullLifecycleProducesReportAndOrderedHistory()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.08" />
+  <testcase name="validatesBodiesUnknownEnumsAndPagination()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.084" />
+  <testcase name="exposesOpenApiAndDatabaseReadiness()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="1.427" />
+  <testcase name="summaryUsesHalfOpenCreatedPeriodForEveryMetric()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.117" />
+  <testcase name="e2eForbiddenOperationLeavesAllDataUnchanged()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.092" />
+  <testcase name="returnsUniform404ForMissingTicketAndHistory()" classname="ru.practice.helpdesk.ApiIntegrationTest" time="0.031" />
+  </testsuite>

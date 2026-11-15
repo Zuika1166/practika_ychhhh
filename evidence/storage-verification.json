@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "ticketId": 8,
+  "backup": "backups/helpdesk-20261115T175438Z.dump",
+  "restoredDatabase": "restore_20261115175438",
+  "restartPreservedData": true,
+  "allTablesMatch": true
+}
