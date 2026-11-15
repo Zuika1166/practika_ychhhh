@@ -80,12 +80,7 @@ jobs:
           cd "$STAND_DIR"
           if [ ! -f .env ]; then
             umask 077
-            printf 'DB_NAME=helpdesk
-DB_USER=helpdesk
-APP_PORT=8080
-APP_BIND=127.0.0.1
-DB_PASSWORD=%s
-' "$DB_PASSWORD" > .env
+            printf '%s\n' 'DB_NAME=helpdesk' 'DB_USER=helpdesk' 'APP_PORT=8080' 'APP_BIND=127.0.0.1' "DB_PASSWORD=$DB_PASSWORD" > .env
           fi
           bash scripts/deploy.sh "$IMAGE"
           docker compose ps

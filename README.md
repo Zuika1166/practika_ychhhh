@@ -31,15 +31,18 @@ sudo ln -sf /usr/bin/docker-compose /usr/local/lib/docker/cli-plugins/docker-com
 docker compose version
 ```
 
-Скопировать helpdesk-kali.zip в ВМ через общую папку VirtualBox или загрузить из браузера Kali. Распаковать в домашний каталог Kali, чтобы сборка выполнялась на файловой системе гостевой ОС:
+Получить проект из GitHub и запустить:
 
 ```bash
-unzip helpdesk-kali.zip -d "$HOME/practice"
-cd "$HOME/practice/helpdesk"
+cd "$HOME"
+git clone https://github.com/Zuika1166/practika_ychhhh.git
+cd practika_ychhhh
 chmod +x gradlew scripts/*.sh
 bash scripts/init-env.sh
 docker compose up -d --build --wait --wait-timeout 180
 ```
+
+Полная инструкция для этого репозитория: [docs/kali-launch.md](docs/kali-launch.md).
 
 `init-env.sh` создаёт .env с локальным случайным паролем. Существующий .env не перезаписывается. .env.example содержит пустой пароль; его не нужно заполнять перед использованием генератора. Первичная сборка загружает Gradle, зависимости и образы, поэтому занимает несколько минут.
 
@@ -170,7 +173,7 @@ docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SEL
 
 ## Git и CI/CD на Kali runner
 
-В архиве сохранена локальная история Git с тематическими ветками и merge-коммитами. После копирования настроить собственную подпись для будущих коммитов:
+В репозитории сохранена история Git с тематическими ветками и merge-коммитами. После копирования настроить собственную подпись для будущих коммитов:
 
 ```bash
 git config user.name "Ваше имя"
@@ -178,7 +181,7 @@ git config user.email "Ваш email"
 git log --graph --oneline --all
 ```
 
-Создать пустой репозиторий GitHub, добавить remote origin с его URL и отправить main и тематические ветки. Для следующего изменения создать ветку, коммит, push и реальный pull request. Шаблон PR включён. История локальных merge-коммитов не заменяет удалённый PR.
+Репозиторий: https://github.com/Zuika1166/practika_ychhhh. Для следующего изменения создать ветку, коммит, push и pull request. Шаблон PR включён. История локальных merge-коммитов не заменяет удалённый PR.
 
 Workflow .github/workflows/ci-cd.yaml:
 
