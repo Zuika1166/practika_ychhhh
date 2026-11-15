@@ -1,0 +1,29 @@
+GET http://127.0.0.1:8080/api/categories
+
+POST http://127.0.0.1:8080/api/tickets
+Content-Type: application/json
+
+{"title":"Не работает принтер","description":"Кабинет 104","categoryId":1,"priority":"HIGH","dueAt":"2030-01-20T16:00:00Z"}
+
+GET http://127.0.0.1:8080/api/tickets/1
+
+PUT http://127.0.0.1:8080/api/tickets/1
+Content-Type: application/json
+
+{"description":"Проверить кабель","priority":"MEDIUM","dueAt":null}
+
+PATCH http://127.0.0.1:8080/api/tickets/1/status
+Content-Type: application/json
+
+{"status":"IN_PROGRESS"}
+
+PATCH http://127.0.0.1:8080/api/tickets/1/status
+Content-Type: application/json
+
+{"status":"RESOLVED"}
+
+GET http://127.0.0.1:8080/api/tickets/1/history
+
+GET http://127.0.0.1:8080/api/tickets?status=NEW&priority=HIGH&page=0&size=20
+
+GET http://127.0.0.1:8080/api/reports/summary?from=2020-01-01T00:00:00Z&to=2100-01-01T00:00:00Z
