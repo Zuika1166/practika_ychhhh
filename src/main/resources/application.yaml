@@ -35,6 +35,7 @@ management:
 info:
   application:
     version: ${APP_VERSION:local}
+    release: practice-2
 logging:
   level:
     root: INFO

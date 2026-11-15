@@ -238,4 +238,4 @@ bash scripts/rollback.sh
 - docs/defense.md — сценарий защиты на 10–15 минут.
 - docs/submission.md — данные реального удалённого pipeline и вашего стенда.
 
-Проверки в комплекте выполнены в Linux-среде подготовки. Доступа к VirtualBox этого ПК, вашему GitHub-аккаунту и runner не было; эти внешние шаги выполняются по инструкции выше и фиксируются в submission.md.
+Первичная проверка выполнена в Linux-среде подготовки; затем на пользовательской Kali Linux в VirtualBox подтверждены запуск, 56 тестов, backup/restore и полный CI/CD через self-hosted runner. Фактические ссылки и результаты находятся в docs/submission.md. Порядок проверки второй версии и отката — docs/rollback-check.md.
