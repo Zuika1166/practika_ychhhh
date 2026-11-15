@@ -72,8 +72,10 @@ class ReportServiceTest {
 
     @Test
     fun preservesSubMillisecondResolutionRegression() {
-        `when`(source.findCreatedBetween(from, to)).thenReturn(
-            listOf(ticket(1, Status.RESOLVED, Priority.LOW, null, from.plusNanos(500000))))
+        `when`(source.findCreatedBetween(from, to))
+            .thenReturn(
+                listOf(ticket(1, Status.RESOLVED, Priority.LOW, null, from.plusNanos(500000)))
+            )
         assertEquals(0.0005, service.summary(from, to).averageResolutionSeconds)
     }
 

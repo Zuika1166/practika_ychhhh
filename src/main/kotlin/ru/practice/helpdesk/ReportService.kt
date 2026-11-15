@@ -30,7 +30,9 @@ class ReportService(private val source: ReportSource, private val clock: Clock) 
                 .filter { it.status() == Status.RESOLVED }
                 .mapNotNull { ticket ->
                     ticket.closedAt()?.let {
-                        Duration.between(ticket.createdAt(), it).toMillis() / 1000.0
+                        Duration.between(ticket.createdAt(), it).let { duration ->
+                            duration.seconds.toDouble() + duration.nano / 1_000_000_000.0
+                        }
                     }
                 }
         return SummaryReport(
