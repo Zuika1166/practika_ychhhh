@@ -26,7 +26,7 @@ python3 scripts/smoke.py
 
 На виртуальной машине подтверждены 56 тестов на JDK 21.0.13  
 
-Первая: run - https://github.com/Zuika1166/practika_ychhhh/actions/runs/43745510914,№1 https://github.com/Zuika1166/practika_ychhhh/pull/1
-Вторая: run - https://github.com/Zuika1166/practika_ychhhh/actions/runs/43756431655, №2 - https://github.com/Zuika1166/practika_ychhhh/pull/2
+Первая: run - https://github.com/Zuika1166/practika_ychhhh/actions/runs/43745510914 ,№1 https://github.com/Zuika1166/practika_ychhhh/pull/1
+Вторая: run - https://github.com/Zuika1166/practika_ychhhh/actions/runs/43756431655 , №2 - https://github.com/Zuika1166/practika_ychhhh/pull/2
 
 Digest manifest -первый - `sha256:27ce77f539f7766a7237b22a7a9e5042e15e8fe381da956a13b6dc0af16cece6`; второй - `sha256:108dc47bf75ec137a998f13fbb16b97258096ae48d15a5614fd67d4282b744dc`
